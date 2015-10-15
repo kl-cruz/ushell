@@ -1,9 +1,6 @@
 #include "stdlib.h"
 #include "ushell.h"
 #include "ushell_config.h"
-#include "format.h"
-
-#define ushell_printf(_format, ...) printf(_format, ##__VA_ARGS__)
 
 typedef struct {
 	char                buf[USHELL_CMD_BUF];

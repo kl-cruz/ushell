@@ -20,4 +20,5 @@ void ushell_loop(void);
  */
 void ushell_putc(char c);
 char ushell_getc(void);
+int  ushell_printf(const char * format, ...);
 #endif // USHELL_H
