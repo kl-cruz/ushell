@@ -3,7 +3,7 @@
 
 #define USHELL_CMD_BUF  64
 #define USHELL_MAX_ARGS 3
-#define USHELL_NEWLINE  '\n'
+#define USHELL_NEWLINE  '\r'
 #define USHELL_PREDICT  '\t'
 #define USHELL_DELETE   127
 

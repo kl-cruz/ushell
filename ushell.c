@@ -1,4 +1,4 @@
-#include "stdlib.h"
+﻿#include "stdlib.h"
 #include "ushell.h"
 #include "ushell_config.h"
 
@@ -79,14 +79,14 @@ void info_cmd( char* argv[], int argc )
 	ushell_printf("ushell is small and simple shell for constrainted\n");
 	ushell_printf("microcontrollers and processors. ushell can be used\n");
 	ushell_printf("with 8, 16, 32 and 64bit architectures. It requieres\n");
-	ushell_printf("to implement only two functions: putc and getc. \n");
+	ushell_printf("to implement only three functions: putc, getc and printf. \n");
 	ushell_printf("\n");
 	ushell_printf("For license constrainted see LICENSE file.\n");
 	ushell_printf("\n");
 #endif
 	ushell_printf("Repository is available at: http://github.com/kl-cruz/ushell\n");
 	ushell_printf("\n");
-	ushell_printf("Karol {cruz} Lasonczyk 2015");
+	ushell_printf("Karol {cruz} Lasonczyk 2015\n");
 }
 
 void lscmd_cmd( char* argv[], int argc )
@@ -162,7 +162,7 @@ unsigned ushell_exec_cmd(char *line, ushell_cmd_def_t *cmds)
 				if((c == ' ')) {
 					args[args_i++] = line+j;
 				}
-			} while(c != '\0' && (args_i <= USHELL_MAX_ARGS));
+			} while(c != '\0' && (args_i < USHELL_MAX_ARGS));
 
 #ifndef USHELL_DISABLE_MAX_ARGS_INFO
 			if(args_i > USHELL_MAX_ARGS) {
@@ -180,10 +180,6 @@ unsigned ushell_exec_cmd(char *line, ushell_cmd_def_t *cmds)
 			result = 1;
 		}
 		cmd_i++;
-	}
-	if (cmd_str_pos != 0) {
-		line[cmd_str_pos] = 0;
-
 	}
 
 	return result;
@@ -233,6 +229,24 @@ char* ushell_hint(char* line, ushell_cmd_def_t *basic_cmds, ushell_cmd_def_t *us
 			}
 			cmd_i++;
 		}
+		if(user_cmds != NULL){
+			cmd_i = 0;
+			while( user_cmds[cmd_i].cmd != NULL) {
+				for( i = 0; i < cmd_str_pos; ++i) {
+					if(user_cmds[cmd_i].cmd_str[i] != line[i]) {
+						i = 0;
+						break;
+					}
+				}
+				/*Probably we found desired command*/
+				if(i != 0) {
+					founds++;
+					cmd = user_cmds[cmd_i].cmd_str;
+					ushell_printf("%s\n", user_cmds[cmd_i].cmd_str);
+				}
+				cmd_i++;
+			}
+		}
 	}
 	if(founds == 1) {
 		return cmd;
@@ -253,11 +267,13 @@ void ushell_loop(void)
 		c = ushell_getc();
 
 		if(c == USHELL_NEWLINE) {
-			ushell_putc('\n');
+			ushell_printf("\n");
 			if(ushell_exec_cmd(ctx.buf, basic_cmds) == 1) {
-				ushell_putc('\n');
+				ushell_printf("\n");
 			} else if(ushell_exec_cmd(ctx.buf, ctx.user_cmds) == 1) {
-				ushell_putc('\n');
+				ushell_printf("\n");
+			} else if(ushell_strlen(ctx.buf) == 0) {
+				;
 			} else {
 				ushell_printf("[ushell ERROR] Command %s not recognized!\n", ctx.buf);
 			}
@@ -280,18 +296,21 @@ void ushell_loop(void)
 			prediction++;
 			if(prediction == 2) {
 				ushell_printf("\n");
-				char* cmd = ushell_hint(ctx.buf, basic_cmds, ctx.user_cmds);
+				char* cmd_hint = ushell_hint(ctx.buf, basic_cmds, ctx.user_cmds);
 				prediction = 0;
-				for(i = 0; i < ushell_strlen(cmd); ++i) {
-					ctx.buf[i] = cmd[i];
+				ushell_putc('>');
+				ushell_putc(' ');
+				for(i = 0; i < ushell_strlen(cmd_hint); ++i) {
+					ctx.buf[i] = cmd_hint[i];
+					ushell_putc(cmd_hint[i]);
 				}
-				ushell_printf("> %s", cmd);
+				ctx.buf_pos = i;
 			}
 			continue;
 		}
 #endif
 
-		if(c == USHELL_DELETE) {
+		if((c == USHELL_DELETE) && (ctx.buf_pos != 0)) {
 			ctx.buf_pos--;
 			ctx.buf[ctx.buf_pos] = '\0';
 			ushell_putc('\b');
