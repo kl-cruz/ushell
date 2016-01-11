@@ -7,9 +7,9 @@
 void args_cmd( char* argv[], int argc )
 {
     unsigned i;
-    printf("arguments count: %d\n", argc);
+    printf("arguments count: %d\r\n", argc);
     for(i = 0; i< argc; ++i) {
-        printf("argument %d: %s\n", i, argv[i]);
+        printf("argument %d: %s\r\n", i, argv[i]);
     }
 }
 
@@ -30,7 +30,7 @@ char ushell_getc()
     //return (char)getchar();
 }
 
-int  ushell_printf(const char * format, ...)
+int ushell_printf(const char * format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -42,9 +42,12 @@ int main(void)
 {
     initscr();
     noecho();
+    refresh();
 
     ushell_init(user_cmds);
     ushell_loop();
+
+    endwin();
     return 0;
 }
 

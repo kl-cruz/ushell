@@ -3,7 +3,7 @@
 #define USHELL_H
 
 #define USHELL_VER_MAJOR 0
-#define USHELL_VER_MINOR 1
+#define USHELL_VER_MINOR 2
 
 typedef void (*ushell_cmd_handler_t)( char* argv[], int argc );
 

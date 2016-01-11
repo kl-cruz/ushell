@@ -1,6 +1,4 @@
-CFLAGS = -g -Iformat/src -Iformat/lib -std=c99 -Wall -pedantic -Wunused
-#-DUSHELL_DISABLE_ECHO
-#-DUSHELL_DISABLE_MAX_ARGS_INFO
+CFLAGS = -g -std=c99 -Wall -pedantic -Wunused
 LDFLAGS = -g
 CC = gcc
 
@@ -12,15 +10,9 @@ main.o: main.c
 ushell.o: ushell.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-format.o: format/src/format.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-printf.o: format/lib/printf.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-test: ushell.o format.o printf.o main.o
-	$(CC) $(CFLAGS) ushell.o format.o printf.o main.o -lcurses -lncurses -o ushell
+test: ushell.o main.o
+	$(CC) $(CFLAGS) ushell.o main.o -lcurses -lncurses -o ushell
 
 clean:
-	rm *.o
-	rm ushell
+	rm -f *.o
+	rm -f ushell
