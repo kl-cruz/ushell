@@ -1,5 +1,5 @@
 # ushell
-Small portable and fully configurable shell for constraited devices based on microcontrollers<br>
+Small portable and fully configurable shell for constrained devices based on microcontrollers.<br>
 <br>
 ushell is suitable solution for microcontrollers and other constrainted devices.
 Library uses only one dependency with standard C library. It can be amend
