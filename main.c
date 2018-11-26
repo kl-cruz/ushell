@@ -1,8 +1,10 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include "ushell.h"
-#include <curses.h>
 #include <string.h>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <stdarg.h>
+#include "ushell.h"
 
 void args_cmd( char* argv[], int argc )
 {
@@ -18,36 +20,57 @@ static ushell_cmd_def_t user_cmds[] = {
     {NULL, NULL}
 };
 
-void ushell_putc(char c)
+
+void ushell_putc( char c )
 {
-    //putchar(c);
-    addch(c);
+	putchar(c);
 }
 
-char ushell_getc()
+char ushell_getc( void )
 {
-    return (char)getch();
-    //return (char)getchar();
+	return (char) getchar();
 }
 
 int ushell_printf(const char * format, ...)
 {
+	int ret;
     va_list ap;
     va_start(ap, format);
-    vprintf(format, ap);
+    ret = vprintf(format, ap);
     va_end(ap);
+
+    return ret;
 }
 
-int main(void)
+
+int main( void )
 {
-    initscr();
-    noecho();
-    refresh();
+	/*
+	 * Configure terminal to get character without
+	 * waiting for a new line.
+	 */
+	struct termios term_old, term_new;
+
+	/* get old terminal settings */
+	tcgetattr(STDIN_FILENO, &term_old);
+
+	/* initialize new settings with old settings */
+	memcpy( &term_new, &term_old, sizeof(struct termios));
+
+	/* enable raw mode */
+	cfmakeraw(&term_new);
+
+	/* translate cartridge return to new line */
+	term_new.c_iflag |= ICRNL;
+
+	/* set new attributes */
+	tcsetattr(STDIN_FILENO, TCSANOW, &term_new);
 
     ushell_init(user_cmds);
     ushell_loop();
 
-    endwin();
-    return 0;
-}
+	/* restore terminal attributes */
+	tcsetattr(STDIN_FILENO, TCSANOW, &term_old);
 
+	return 0;
+}

@@ -1,5 +1,5 @@
-﻿#include "stdlib.h"
-#include "ushell.h"
+﻿#include "ushell.h"
+#include "stdlib.h"
 #include "ushell_config.h"
 
 typedef struct {
@@ -13,7 +13,7 @@ static ushell_ctx_t ctx;
 
 /*ushell atomic functions*/
 
-int ushell_strlen(char *str) {
+int ushell_strlen(const char *str) {
     unsigned j = 0;
     while(str[j] != '\0') {
         ++j;
@@ -29,12 +29,6 @@ int ushell_strncmp(const char *s1, const char *s2, size_t n) {
         }
     }
     return 0;
-}
-
-int putchar(int c)
-{
-    ushell_putc((char) c);
-    return 1;
 }
 
 /*Basic ushell functions*/
@@ -133,7 +127,7 @@ unsigned ushell_exec_cmd(char *line, ushell_cmd_def_t *cmds)
 
     /*ushell is not depend of any library so strcmp is implemented below*/
     while( cmds[cmd_i].cmd != NULL) {
-        char *cmd_s = cmds[cmd_i].cmd_str;
+        const char *cmd_s = cmds[cmd_i].cmd_str;
         unsigned j = 0;
 
         j = ushell_strlen(cmd_s);
@@ -186,11 +180,11 @@ unsigned ushell_exec_cmd(char *line, ushell_cmd_def_t *cmds)
 }
 
 #ifndef USHELL_DISABLE_HINT
-char* ushell_hint(char* line, ushell_cmd_def_t *basic_cmds, ushell_cmd_def_t *user_cmds)
+const char* ushell_hint(char* line, ushell_cmd_def_t *basic_cmds, ushell_cmd_def_t *user_cmds)
 {
     size_t cmd_str_pos = 0;
     unsigned i = 0, cmd_i = 0, founds = 0;
-    char *cmd;
+    const char *cmd;
     char c;
 
     if(line[0] == '\0') {
@@ -277,7 +271,7 @@ void ushell_loop(void)
             prediction++;
             if(prediction == 2) {
                 ushell_printf(USHELL_NEWLINE_PRINT);
-                char* cmd_hint = ushell_hint(ctx.buf, basic_cmds, ctx.user_cmds);
+                const char* cmd_hint = ushell_hint(ctx.buf, basic_cmds, ctx.user_cmds);
                 prediction = 0;
                 ushell_putc('>');
                 ushell_putc(' ');
